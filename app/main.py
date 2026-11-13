@@ -10,11 +10,13 @@ from .database import Base, engine, SessionLocal
 from .models import Entry
 from .schemas import EntryCreate, EntryRead
 
+# Version de la aplicacion obtenida de la variable de entorno APP_VERSION, si no está definida, usamos "10.3" como valor por defecto.
 APP_VERSION = os.getenv("APP_VERSION", "10.3")
 
+# Configuración de Jinja2 para renderizar plantillas HTML desde el directorio "app/templates".
 templates = Jinja2Templates(directory="app/templates")
 
-
+# Al arrancar la aplicacion se inicializa la base de datos de desarrollo local, creando las tablas definidas en los modelos ORM si no existen.
 def init_db():
     Base.metadata.create_all(bind=engine)
 
@@ -22,16 +24,16 @@ def init_db():
 def get_session() -> Session:
     return SessionLocal()
 
-
+# El ciclo de vida de la aplicación se define mediante un contexto asíncrono que inicializa la base de datos al arrancar la aplicación y luego cierra la sesión de la base de datos al finalizar.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     yield
 
-
+# Creación de la instancia de FastAPI con título, versión y ciclo de vida definido.
 app = FastAPI(title="Text Entries", version=APP_VERSION, lifespan=lifespan)
 
-
+# Endoint de salud de la aplicación que devuelve un JSON con el estado "ok" simplemente
 @app.get("/health")
 def health():
     return {"status": "ok"}
