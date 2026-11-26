@@ -1,0 +1,13 @@
+# Blueprint de Render: describe el servicio de produccion.
+services:
+  - type: web
+    name: text-entries
+    runtime: docker
+    plan: free
+    region: virginia # Conviene la misma region (o la mas cercana) que el proyecto de Supabase. No se puede cambiar despues.
+    branch: main
+    healthCheckPath: /health
+    autoDeployTrigger: "off" # Solo se despliega desde GitHub Actions al crear un tag.
+    envVars:
+      - key: DATABASE_URL # Cadena de conexion de Supabase. Se carga a mano en Render, nunca en el repositorio.
+        sync: false

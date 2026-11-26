@@ -55,3 +55,22 @@ Corre el linter, los tests unitarios y de integracion, y los tests de aceptacion
 ## GitHub Actions
 
 En cada push y pull request a `main`, el workflow `.github/workflows/ci.yml` corre el linter, los tests unitarios y de integracion, y los tests de aceptacion. No usa `ci.sh`: si cambian las etapas, hay que actualizar ambos.
+
+## Deploy a produccion
+
+Cada tag nuevo despliega su commit en Render (con la base de datos en Supabase), siempre que antes pasen el linter y los tests. Ver `.github/workflows/deploy.yml`.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### Configuracion inicial (una sola vez)
+
+1. **Supabase:** crear un proyecto. En *Connect*, copiar la cadena de **Session pooler** (puerto 5432), reemplazar la contrasena (codificando caracteres especiales) y agregar `?sslmode=require` al final.
+2. **Supabase:** desactivar la Data API (*Integrations > Data API > Enable Data API*). La app se conecta directo a Postgres y no la usa.
+3. **Render:** *New > Blueprint*, elegir este repositorio (usa `render.yaml`) y cargar `DATABASE_URL` con la cadena anterior.
+4. **GitHub:** en *Settings > Secrets and variables > Actions*, crear los secretos:
+   - `RENDER_DEPLOY_HOOK_URL`: en el servicio de Render, *Settings > Deploy Hook*.
+   - `RENDER_API_KEY`: en Render, *Account Settings > API Keys*.
+   - `RENDER_SERVICE_ID`: el identificador `srv-...` que aparece en la URL del servicio.

@@ -43,6 +43,10 @@ From the host (with dependencies installed and `db_test` running via `docker com
 
 Except for `tests/unit/test_sistema.py`, tests need a real PostgreSQL; there is no SQLite fallback.
 
+## Deployment
+
+Pushing any tag runs `.github/workflows/deploy.yml`: it reuses `ci.yml` (`workflow_call`), then triggers a Render deploy hook for the tagged commit and polls the Render API until it is live or fails. Production is the Docker service in `render.yaml` (auto-deploy off) with PostgreSQL on Supabase (session pooler, `DATABASE_URL` set only in Render). The container listens on `$PORT`, default 8000. Setup steps are in the README.
+
 ## Architecture
 
 Hexagonal (ports and adapters):
