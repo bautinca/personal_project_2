@@ -4,7 +4,7 @@ services:
     name: text-entries
     runtime: docker
     plan: free
-    region: virginia # Conviene la misma region (o la mas cercana) que el proyecto de Supabase. No se puede cambiar despues.
+    region: ohio # Conviene la misma region (o la mas cercana) que el proyecto de Supabase. No se puede cambiar despues.
     branch: main
     healthCheckPath: /health
     autoDeployTrigger: "off" # Solo se despliega desde GitHub Actions al crear un tag.
