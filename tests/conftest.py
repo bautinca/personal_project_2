@@ -5,24 +5,20 @@ os.environ.setdefault("DATABASE_URL", "postgresql+psycopg2://app:app@localhost:5
 os.environ.setdefault("APP_VERSION", "10.3")
 
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from app.database import Base, engine
+from app.adapters.persistence.database import Base, engine, init_db
 from app.main import app
 
-# ensure tables
-Base.metadata.create_all(bind=engine)
 
-
-@pytest.fixture(autouse=True)
+# Solo los tests que piden este fixture necesitan una base de datos.
+@pytest.fixture
 def clean_tables():
     Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    init_db()
     yield
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
-def client():
+def client(clean_tables):
     return TestClient(app)

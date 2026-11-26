@@ -17,6 +17,7 @@
             <tr>
                 <th>ID</th>
                 <th>Texto</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +25,11 @@
             <tr>
                 <td>{{ entry.id }}</td>
                 <td>{{ entry.text }}</td>
+                <td>
+                    <form method="post" action="/entries/{{ entry.id }}/delete">
+                        <button type="submit">eliminar</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

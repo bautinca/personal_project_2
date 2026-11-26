@@ -1,13 +1,14 @@
+# Controlador HTTP: traduce peticiones HTTP a llamadas a Sistema y sus resultados a respuestas HTTP.
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
 
-from .database import Base, engine, SessionLocal
-from .models import Entry
+from .bootstrap import get_sistema, init_infrastructure
+from .hexagon.errors import EntryNotFound
+from .hexagon.sistema import Sistema
 from .schemas import EntryCreate, EntryRead
 
 # Version de la aplicacion obtenida de la variable de entorno APP_VERSION, si no está definida, usamos "10.3" como valor por defecto.
@@ -16,22 +17,22 @@ APP_VERSION = os.getenv("APP_VERSION", "10.3")
 # Configuración de Jinja2 para renderizar plantillas HTML desde el directorio "app/templates".
 templates = Jinja2Templates(directory="app/templates")
 
-# Al arrancar la aplicacion se inicializa la base de datos de desarrollo local, creando las tablas definidas en los modelos ORM si no existen.
-def init_db():
-    Base.metadata.create_all(bind=engine)
 
-
-def get_session() -> Session:
-    return SessionLocal()
-
-# El ciclo de vida de la aplicación se define mediante un contexto asíncrono que inicializa la base de datos al arrancar la aplicación y luego cierra la sesión de la base de datos al finalizar.
+# El ciclo de vida de la aplicación se define mediante un contexto asíncrono que inicializa los servicios externos al arrancar la aplicación.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    init_infrastructure()
     yield
 
 # Creación de la instancia de FastAPI con título, versión y ciclo de vida definido.
 app = FastAPI(title="Text Entries", version=APP_VERSION, lifespan=lifespan)
+
+
+def render_index(request: Request, sistema: Sistema):
+    return templates.TemplateResponse(
+        request, "index.html", {"entries": sistema.list_entries(), "version": APP_VERSION}
+    )
+
 
 # Endoint de salud de la aplicación que devuelve un JSON con el estado "ok" simplemente
 @app.get("/health")
@@ -45,51 +46,40 @@ def version():
 
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    db = get_session()
-    try:
-        entries = db.query(Entry).order_by(Entry.id).all()
-        return templates.TemplateResponse(
-            request, "index.html", {"entries": entries, "version": APP_VERSION}
-        )
-    finally:
-        db.close()
+def index(request: Request, sistema: Sistema = Depends(get_sistema)):
+    return render_index(request, sistema)
 
 
 @app.post("/", response_class=HTMLResponse)
-def create_from_form(request: Request, text: str = Form(...)):
-    db = get_session()
-    try:
-        entry = Entry(text=text)
-        db.add(entry)
-        db.commit()
-        db.refresh(entry)
-        entries = db.query(Entry).order_by(Entry.id).all()
-        return templates.TemplateResponse(
-            request, "index.html", {"entries": entries, "version": APP_VERSION}
-        )
-    finally:
-        db.close()
+def create_from_form(request: Request, text: str = Form(...), sistema: Sistema = Depends(get_sistema)):
+    sistema.add_entry(text)
+    return render_index(request, sistema)
 
 
-@app.get("/entries")
-def list_entries():
-    db = get_session()
+# Los formularios HTML solo soportan GET y POST, por eso la interfaz web elimina mediante un POST.
+# Si la entrada ya no existe (por ejemplo, una pagina desactualizada) simplemente se vuelve al listado.
+@app.post("/entries/{entry_id}/delete")
+def delete_from_form(entry_id: int, sistema: Sistema = Depends(get_sistema)):
     try:
-        entries = db.query(Entry).order_by(Entry.id).all()
-        return [EntryRead.model_validate(e) for e in entries]
-    finally:
-        db.close()
+        sistema.delete_entry(entry_id)
+    except EntryNotFound:
+        pass
+    return RedirectResponse("/", status_code=303)
+
+
+@app.get("/entries", response_model=list[EntryRead])
+def list_entries(sistema: Sistema = Depends(get_sistema)):
+    return sistema.list_entries()
 
 
 @app.post("/entries", response_model=EntryRead)
-def create_entry(payload: EntryCreate):
-    db = get_session()
+def create_entry(payload: EntryCreate, sistema: Sistema = Depends(get_sistema)):
+    return sistema.add_entry(payload.text)
+
+
+@app.delete("/entries/{entry_id}", status_code=204)
+def delete_entry(entry_id: int, sistema: Sistema = Depends(get_sistema)):
     try:
-        entry = Entry(text=payload.text)
-        db.add(entry)
-        db.commit()
-        db.refresh(entry)
-        return EntryRead.model_validate(entry)
-    finally:
-        db.close()
+        sistema.delete_entry(entry_id)
+    except EntryNotFound:
+        raise HTTPException(status_code=404, detail="Entrada no encontrada")

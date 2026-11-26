@@ -11,6 +11,13 @@ def step_send_text(context, text):
     context.response = context.client.post("/", data={"text": text})
 
 
+@when('el usuario elimina el texto "{text}"')
+def step_delete_text(context, text):
+    entries = context.client.get("/entries").json()
+    entry_id = next(e["id"] for e in entries if e["text"] == text)
+    context.response = context.client.post(f"/entries/{entry_id}/delete")
+
+
 @when("consulto el endpoint de health")
 def step_health(context):
     context.response = context.client.get("/health")
@@ -29,6 +36,11 @@ def step_ok(context):
 @then('el texto "{text}" aparece en la pagina')
 def step_text_in_page(context, text):
     assert text in context.response.text
+
+
+@then('el texto "{text}" no aparece en la pagina')
+def step_text_not_in_page(context, text):
+    assert text not in context.response.text
 
 
 @then('el estado es "{status}"')
