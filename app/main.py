@@ -82,4 +82,4 @@ def delete_entry(entry_id: int, sistema: Sistema = Depends(get_sistema)):
     try:
         sistema.delete_entry(entry_id)
     except EntryNotFound:
-        raise HTTPException(status_code=404, detail="Entrada no encontrada")
+        raise HTTPException(status_code=404, detail="Entrada no encontrada") from None

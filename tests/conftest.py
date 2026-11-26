@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg2://app:app@localhost:5433/appdb_test")
