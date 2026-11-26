@@ -1,0 +1,22 @@
+line-length = 120
+target-version = "py312"
+
+[lint]
+select = [
+    "E",  # errores de estilo (pycodestyle)
+    "F",  # errores logicos (pyflakes)
+    "I",  # orden de los imports (isort)
+    "B",  # bugs probables (flake8-bugbear)
+    "UP", # sintaxis moderna de Python (pyupgrade)
+]
+ignore = [
+    "E501", # lineas largas: los comentarios explicativos superan el limite
+]
+
+[lint.flake8-bugbear]
+# En FastAPI es normal llamar a Depends() y Form() como valor por defecto de un parametro.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Form"]
+
+[lint.per-file-ignores]
+# behave define given/when/then dinamicamente.
+"tests/acceptance/features/steps/*.py" = ["F811"]

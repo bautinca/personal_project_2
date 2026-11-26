@@ -14,7 +14,12 @@ docker compose restart app       # needed after code changes: the source is moun
 docker compose up --build app    # needed after changing requirements.txt
 ```
 
-No linter or formatter is configured.
+Lint and format with ruff (configured in `ruff.toml`; the containers must be running):
+
+```bash
+docker compose exec app ruff check .          # add --fix to apply safe fixes
+docker compose exec app ruff format .         # add --diff to preview
+```
 
 ### Tests
 

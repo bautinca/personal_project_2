@@ -26,3 +26,20 @@ Para correr tests contra la DB de testing, usar DATABASE_URL apuntando a db_test
 ```bash
 DATABASE_URL=postgresql+psycopg2://app:app@db_test:5432/appdb_test
 ```
+
+## Linter (ruff)
+
+Revisar el codigo:
+```bash
+docker compose exec app ruff check .
+```
+
+Corregir automaticamente lo que se pueda:
+```bash
+docker compose exec app ruff check --fix .
+```
+
+Formatear el codigo:
+```bash
+docker compose exec app ruff format .
+```
