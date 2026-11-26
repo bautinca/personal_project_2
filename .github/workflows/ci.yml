@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Linter y tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Base de datos de testing: se crea vacia en cada ejecucion y se descarta al terminar.
+    services:
+      db_test:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+          POSTGRES_DB: appdb_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U app -d appdb_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+psycopg2://app:app@localhost:5432/appdb_test
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v7
+
+      - name: Instalar Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Linter (ruff)
+        run: ruff check .
+
+      - name: Tests unitarios y de integracion (pytest)
+        run: pytest
+
+      - name: Tests de aceptacion (behave)
+        run: behave

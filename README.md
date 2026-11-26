@@ -51,3 +51,7 @@ Corre el linter, los tests unitarios y de integracion, y los tests de aceptacion
 ```bash
 ./ci.sh
 ```
+
+## GitHub Actions
+
+En cada push y pull request a `main`, el workflow `.github/workflows/ci.yml` corre el linter, los tests unitarios y de integracion, y los tests de aceptacion. No usa `ci.sh`: si cambian las etapas, hay que actualizar ambos.

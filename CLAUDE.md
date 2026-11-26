@@ -21,7 +21,7 @@ docker compose exec app ruff check .          # add --fix to apply safe fixes
 docker compose exec app ruff format .         # add --diff to preview
 ```
 
-`./ci.sh` (run on the host) is the local CI pipeline: ruff, then pytest, then behave, always against `db_test`, stopping at the first failing stage.
+`./ci.sh` (run on the host) is the local CI pipeline: ruff, then pytest, then behave, always against `db_test`, stopping at the first failing stage. GitHub Actions (`.github/workflows/ci.yml`) runs the same three stages on pushes and pull requests to `main`, but independently of the script: it installs dependencies natively on the runner with a PostgreSQL service container. Change both when the stages change.
 
 ### Tests
 
