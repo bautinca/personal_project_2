@@ -73,4 +73,4 @@ git push origin v1.0.0
 4. **GitHub:** en *Settings > Secrets and variables > Actions*, crear los secretos:
    - `RENDER_DEPLOY_HOOK_URL`: en el servicio de Render, *Settings > Deploy Hook*.
    - `RENDER_API_KEY`: en Render, *Account Settings > API Keys*.
-   - `RENDER_SERVICE_ID`: el identificador `srv-...` que aparece en la URL del servicio.
+   - `RENDER_SERVICE_ID`: el identificador `srv-...` que aparece en la URL del servicio
