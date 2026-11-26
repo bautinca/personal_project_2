@@ -21,6 +21,8 @@ docker compose exec app ruff check .          # add --fix to apply safe fixes
 docker compose exec app ruff format .         # add --diff to preview
 ```
 
+`./ci.sh` (run on the host) is the local CI pipeline: ruff, then pytest, then behave, always against `db_test`, stopping at the first failing stage.
+
 ### Tests
 
 **Both test suites drop all tables in whatever `DATABASE_URL` points to.** The `app` container sets it to the development database, and the test setup only applies its own default when the variable is unset. A plain `docker compose exec app pytest` (as shown in the README) therefore wipes development data. Override it:

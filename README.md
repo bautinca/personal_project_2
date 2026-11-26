@@ -43,3 +43,11 @@ Formatear el codigo:
 ```bash
 docker compose exec app ruff format .
 ```
+
+## Pipeline CI local
+
+Corre el linter, los tests unitarios y de integracion, y los tests de aceptacion contra la DB de testing. Se detiene en la primera etapa que falla.
+
+```bash
+./ci.sh
+```
