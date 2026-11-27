@@ -6,6 +6,13 @@ Feature: Persistir texto ingresado por el usuario
     Then la respuesta es exitosa
     And el texto "Hola behave" aparece en la pagina
 
+  Scenario: Recargar la pagina no vuelve a guardar el texto
+    Given la aplicacion esta disponible
+    When el usuario envia el texto "Una sola vez"
+    And el usuario recarga la pagina
+    Then la respuesta es exitosa
+    And el texto "Una sola vez" aparece una sola vez en la tabla
+
   Scenario: El usuario elimina un texto y desaparece de la tabla
     Given la aplicacion esta disponible
     When el usuario envia el texto "Texto a borrar"

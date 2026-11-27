@@ -82,3 +82,11 @@ def test_index_page_shows_delete_button(client):
     r = client.get("/")
     assert f'action="/entries/{entry_id}/delete"' in r.text
     assert "eliminar" in r.text
+
+
+def test_create_from_form_redirects_to_index(client):
+    r = client.post("/", data={"text": "desde el formulario"}, follow_redirects=False)
+
+    assert r.status_code == 303
+    assert r.headers["location"] == "/"
+    assert [e["text"] for e in client.get("/entries").json()] == ["desde el formulario"]

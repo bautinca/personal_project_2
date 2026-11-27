@@ -18,6 +18,13 @@ def step_delete_text(context, text):
     context.response = context.client.post(f"/entries/{entry_id}/delete")
 
 
+# Igual que el navegador: recargar repite la ultima peticion que produjo la pagina actual.
+@when("el usuario recarga la pagina")
+def step_reload(context):
+    last = context.response.request
+    context.response = context.client.request(last.method, last.url, content=last.content, headers=last.headers)
+
+
 @when("consulto el endpoint de health")
 def step_health(context):
     context.response = context.client.get("/health")
@@ -41,6 +48,11 @@ def step_text_in_page(context, text):
 @then('el texto "{text}" no aparece en la pagina')
 def step_text_not_in_page(context, text):
     assert text not in context.response.text
+
+
+@then('el texto "{text}" aparece una sola vez en la tabla')
+def step_text_once(context, text):
+    assert context.response.text.count(f"<td>{text}</td>") == 1
 
 
 @then('el estado es "{status}"')

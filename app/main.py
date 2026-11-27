@@ -28,12 +28,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Text Entries", version=APP_VERSION, lifespan=lifespan)
 
 
-def render_index(request: Request, sistema: Sistema):
-    return templates.TemplateResponse(
-        request, "index.html", {"entries": sistema.list_entries(), "version": APP_VERSION}
-    )
-
-
 # Endoint de salud de la aplicación que devuelve un JSON con el estado "ok" simplemente
 @app.get("/health")
 def health():
@@ -47,13 +41,16 @@ def version():
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request, sistema: Sistema = Depends(get_sistema)):
-    return render_index(request, sistema)
+    return templates.TemplateResponse(
+        request, "index.html", {"entries": sistema.list_entries(), "version": APP_VERSION}
+    )
 
 
-@app.post("/", response_class=HTMLResponse)
-def create_from_form(request: Request, text: str = Form(...), sistema: Sistema = Depends(get_sistema)):
+# Se redirige tras guardar (Post/Redirect/Get) para que recargar la pagina no vuelva a enviar el formulario.
+@app.post("/")
+def create_from_form(text: str = Form(...), sistema: Sistema = Depends(get_sistema)):
     sistema.add_entry(text)
-    return render_index(request, sistema)
+    return RedirectResponse("/", status_code=303)
 
 
 # Los formularios HTML solo soportan GET y POST, por eso la interfaz web elimina mediante un POST.
