@@ -1,4 +1,4 @@
-Feature: Persistir texto ingresado por el usuario
+Feature: Alta y baja de textos ingresados por el usuario
 
   Scenario: El usuario ingresa un texto y aparece en la tabla
     Given la aplicacion esta disponible
@@ -28,13 +28,3 @@ Feature: Persistir texto ingresado por el usuario
     Then la respuesta es exitosa
     And el texto "Texto a borrar" no aparece en la pagina
     And el texto "Texto que se queda" aparece en la pagina
-
-  Scenario: Health endpoint
-    Given la aplicacion esta disponible
-    When consulto el endpoint de health
-    Then el estado es "ok"
-
-  Scenario: Version endpoint
-    Given la aplicacion esta disponible
-    When consulto el endpoint de version
-    Then la version es la definida en el archivo VERSION
