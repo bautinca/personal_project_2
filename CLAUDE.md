@@ -61,7 +61,7 @@ Two interfaces go through the same facade: HTML forms (`GET`/`POST /` rendering 
 Tests: `tests/unit/test_sistema.py` exercises the core with the in-memory adapter and needs no database; `tests/unit/test_api.py`, `tests/integration/` and the behave scenarios use real PostgreSQL. Only tests requesting the `client` or `clean_tables` fixtures touch the database.
 
 - `engine` is created at import time from `DATABASE_URL`, so the variable must be set before anything imports `app.main` or the persistence adapter. This is why `tests/conftest.py` and `tests/acceptance/features/environment.py` set it above their imports.
-- There are no migrations. The schema comes from `init_db()` (`create_all`, run in the app lifespan through `bootstrap.init_infrastructure()`), which does not alter existing tables; a model change needs the table or the `db_data` volume recreated.
-- The tests use `TestClient` without a context manager, so the lifespan does not run; the test setup creates the tables itself.
+- Schema changes go through Alembic (`alembic.ini`, `app/adapters/persistence/migrations/`). The Dockerfile `CMD` runs `alembic upgrade head` before uvicorn; the app itself never creates tables. After editing `models.py`, generate a revision with `docker compose exec --user "$(id -u):$(id -g)" app alembic revision --autogenerate -m "..."` and review it; `tests/integration/test_migrations.py` fails if models and migrations differ. Revision `0001` skips creation when `entries` already exists (databases that predate Alembic).
+- Tests build the schema by running the migrations (`tests/database.py`, shared by pytest and behave).
 - The templates directory is a relative path (`app/templates`), so the app and tests must run from the repository root.
 - The version is set by hand in the root `VERSION` file (`X.Y.Z`), read once at startup through `app/version.py`. There is no `APP_VERSION` variable, and tests compare against the file.

@@ -27,6 +27,31 @@ Para correr tests contra la DB de testing, usar DATABASE_URL apuntando a db_test
 DATABASE_URL=postgresql+psycopg2://app:app@db_test:5432/appdb_test
 ```
 
+## Migraciones (Alembic)
+
+El esquema de la base se gestiona con migraciones en `app/adapters/persistence/migrations/versions/`. El contenedor aplica las pendientes (`alembic upgrade head`) antes de arrancar la app, en local y en produccion.
+
+Para cambiar el esquema:
+
+1. Modificar el modelo en `app/adapters/persistence/models.py`.
+2. Generar la migracion (con los contenedores levantados) y **revisar el archivo generado**:
+   ```bash
+   docker compose exec --user "$(id -u):$(id -g)" app alembic revision --autogenerate -m "descripcion del cambio"
+   ```
+3. Aplicarla en desarrollo:
+   ```bash
+   docker compose restart app
+   ```
+
+Otros comandos:
+```bash
+docker compose exec app alembic current        # revision aplicada
+docker compose exec app alembic history        # historial
+docker compose exec app alembic downgrade -1   # revierte la ultima (puede borrar datos)
+```
+
+En produccion, la migracion corre mientras la version anterior sigue atendiendo, asi que conviene que los cambios sean compatibles con ella (por ejemplo, agregar columnas opcionales y borrar las viejas en un deploy posterior).
+
 ## Linter (ruff)
 
 Revisar el codigo:

@@ -20,3 +20,5 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.Form"]
 [lint.per-file-ignores]
 # behave define given/when/then dinamicamente.
 "tests/acceptance/features/steps/*.py" = ["F811"]
+# Las migraciones generadas importan sa y op aunque no siempre usen ambos.
+"app/adapters/persistence/migrations/versions/*.py" = ["F401"]

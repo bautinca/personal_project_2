@@ -10,3 +10,4 @@ httpx==0.27.2 # Cliente HTTP asíncrono para realizar solicitudes HTTP de manera
 behave==1.2.6 # Framework de pruebas de comportamiento (BDD) para Python que permite escribir pruebas en un lenguaje natural y ejecutarlas de manera automatizada. Facilita la colaboración entre desarrolladores, testers y stakeholders al permitir que todos comprendan las pruebas y los requisitos del sistema. Basicamente son los gherkin tests.
 python-dotenv==1.0.1 # Biblioteca para cargar variables de entorno desde un archivo .env en aplicaciones Python. Permite gestionar configuraciones sensibles y mantenerlas separadas del código fuente, facilitando la configuración de entornos de desarrollo, pruebas y producción.
 ruff==0.17.6 # Linter y formateador de codigo Python. Detecta errores, ordena los imports y unifica el estilo del codigo.
+alembic==1.20.1 # Migraciones de la base de datos para SQLAlchemy. Cada cambio de esquema queda versionado en un archivo.

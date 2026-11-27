@@ -1,11 +1,9 @@
 # Controlador HTTP: traduce peticiones HTTP a llamadas a Sistema y sus resultados a respuestas HTTP.
-from contextlib import asynccontextmanager
-
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from .bootstrap import get_sistema, init_infrastructure
+from .bootstrap import get_sistema
 from .hexagon.errors import EntryNotFound
 from .hexagon.sistema import Sistema
 from .schemas import EntryCreate, EntryRead
@@ -17,14 +15,8 @@ APP_VERSION = read_version()
 templates = Jinja2Templates(directory="app/templates")
 
 
-# El ciclo de vida de la aplicación se define mediante un contexto asíncrono que inicializa los servicios externos al arrancar la aplicación.
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_infrastructure()
-    yield
-
-# Creación de la instancia de FastAPI con título, versión y ciclo de vida definido.
-app = FastAPI(title="Text Entries", version=APP_VERSION, lifespan=lifespan)
+# Creación de la instancia de FastAPI con título y versión. El esquema de la base lo gestiona Alembic antes de arrancar.
+app = FastAPI(title="Text Entries", version=APP_VERSION)
 
 
 # Endoint de salud de la aplicación que devuelve un JSON con el estado "ok" simplemente

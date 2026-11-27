@@ -4,18 +4,14 @@ os.environ.setdefault("DATABASE_URL", "postgresql+psycopg2://app:app@localhost:5
 
 from fastapi.testclient import TestClient
 
-from app.adapters.persistence.database import Base, engine, init_db
 from app.main import app
-
-init_db()
+from tests.database import reset_database
 
 
 def before_scenario(context, scenario):
-    Base.metadata.drop_all(bind=engine)
-    init_db()
+    reset_database()
     context.client = TestClient(app)
 
 
 def after_scenario(context, scenario):
-    Base.metadata.drop_all(bind=engine)
-    init_db()
+    reset_database()
