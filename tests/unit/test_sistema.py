@@ -40,3 +40,29 @@ def test_delete_only_removes_selected_entry(sistema):
 def test_delete_missing_entry_raises(sistema):
     with pytest.raises(EntryNotFound):
         sistema.delete_entry(999)
+
+
+def test_update_entry_changes_text_and_keeps_id(sistema):
+    entry = sistema.add_entry("original")
+
+    updated = sistema.update_entry(entry.id, "modificado")
+
+    assert updated.id == entry.id
+    assert updated.text == "modificado"
+    assert sistema.list_entries() == [updated]
+
+
+def test_update_only_changes_selected_entry_and_keeps_order(sistema):
+    first = sistema.add_entry("primero")
+    second = sistema.add_entry("segundo")
+
+    updated = sistema.update_entry(first.id, "primero modificado")
+
+    assert sistema.list_entries() == [updated, second]
+
+
+def test_update_missing_entry_raises_and_creates_nothing(sistema):
+    with pytest.raises(EntryNotFound):
+        sistema.update_entry(999, "nada")
+
+    assert sistema.list_entries() == []

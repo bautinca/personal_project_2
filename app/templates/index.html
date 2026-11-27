@@ -26,6 +26,10 @@
                 <td>{{ entry.id }}</td>
                 <td>{{ entry.text }}</td>
                 <td>
+                    <form method="post" action="/entries/{{ entry.id }}/edit">
+                        <input type="text" name="text" value="{{ entry.text }}" aria-label="Nuevo texto" required>
+                        <button type="submit">modificar</button>
+                    </form>
                     <form method="post" action="/entries/{{ entry.id }}/delete">
                         <button type="submit">eliminar</button>
                     </form>

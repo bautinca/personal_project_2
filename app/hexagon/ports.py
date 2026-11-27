@@ -14,5 +14,9 @@ class EntryRepository(ABC):
         """Devuelve todas las entradas ordenadas por id."""
 
     @abstractmethod
+    def update(self, entry_id: int, text: str) -> Entry | None:
+        """Reemplaza el texto de la entrada indicada y la devuelve. Devuelve None si no existe."""
+
+    @abstractmethod
     def delete(self, entry_id: int) -> bool:
         """Elimina la entrada indicada. Devuelve False si no existe."""

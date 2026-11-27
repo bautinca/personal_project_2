@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from .bootstrap import get_sistema
 from .hexagon.errors import EntryNotFound
 from .hexagon.sistema import Sistema
-from .schemas import EntryCreate, EntryRead
+from .schemas import EntryCreate, EntryRead, EntryUpdate
 from .version import read_version
 
 APP_VERSION = read_version()
@@ -44,8 +44,17 @@ def create_from_form(text: str = Form(...), sistema: Sistema = Depends(get_siste
     return RedirectResponse("/", status_code=303)
 
 
-# Los formularios HTML solo soportan GET y POST, por eso la interfaz web elimina mediante un POST.
+# Los formularios HTML solo soportan GET y POST, por eso la interfaz web modifica y elimina mediante un POST.
 # Si la entrada ya no existe (por ejemplo, una pagina desactualizada) simplemente se vuelve al listado.
+@app.post("/entries/{entry_id}/edit")
+def update_from_form(entry_id: int, text: str = Form(...), sistema: Sistema = Depends(get_sistema)):
+    try:
+        sistema.update_entry(entry_id, text)
+    except EntryNotFound:
+        pass
+    return RedirectResponse("/", status_code=303)
+
+
 @app.post("/entries/{entry_id}/delete")
 def delete_from_form(entry_id: int, sistema: Sistema = Depends(get_sistema)):
     try:
@@ -63,6 +72,14 @@ def list_entries(sistema: Sistema = Depends(get_sistema)):
 @app.post("/entries", response_model=EntryRead)
 def create_entry(payload: EntryCreate, sistema: Sistema = Depends(get_sistema)):
     return sistema.add_entry(payload.text)
+
+
+@app.put("/entries/{entry_id}", response_model=EntryRead)
+def update_entry(entry_id: int, payload: EntryUpdate, sistema: Sistema = Depends(get_sistema)):
+    try:
+        return sistema.update_entry(entry_id, payload.text)
+    except EntryNotFound:
+        raise HTTPException(status_code=404, detail="Entrada no encontrada") from None
 
 
 @app.delete("/entries/{entry_id}", status_code=204)

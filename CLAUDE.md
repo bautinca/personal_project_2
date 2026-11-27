@@ -56,7 +56,7 @@ Hexagonal (ports and adapters):
 - `app/bootstrap.py` is the composition root, the only place that picks which adapter backs each port.
 - `app/main.py` is a pure HTTP controller. Routes get `Sistema` through `Depends(get_sistema)` and translate domain errors into HTTP responses; business logic and database access do not belong there. `app/schemas.py` holds the HTTP DTOs.
 
-Two interfaces go through the same facade: HTML forms (`GET`/`POST /` rendering `app/templates/index.html`, plus `POST /entries/{id}/delete`; both form POSTs answer with a 303 redirect to `/`, so reloading never resubmits) and a JSON API (`GET`/`POST /entries`, `DELETE /entries/{id}`). `/health` and `/version` are also there.
+Two interfaces go through the same facade: HTML forms (`GET`/`POST /` rendering `app/templates/index.html`, plus `POST /entries/{id}/edit` and `POST /entries/{id}/delete`; all form POSTs answer with a 303 redirect to `/`, so reloading never resubmits) and a JSON API (`GET`/`POST /entries`, `PUT`/`DELETE /entries/{id}`). `/health` and `/version` are also there.
 
 Tests: `tests/unit/test_sistema.py` exercises the core with the in-memory adapter and needs no database; `tests/unit/test_api.py`, `tests/integration/` and the behave scenarios use real PostgreSQL. Only tests requesting the `client` or `clean_tables` fixtures touch the database.
 

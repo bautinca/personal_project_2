@@ -13,11 +13,20 @@ def step_send_text(context, text):
     context.response = context.client.post("/", data={"text": text})
 
 
+def find_entry_id(context, text):
+    entries = context.client.get("/entries").json()
+    return next(e["id"] for e in entries if e["text"] == text)
+
+
 @when('el usuario elimina el texto "{text}"')
 def step_delete_text(context, text):
-    entries = context.client.get("/entries").json()
-    entry_id = next(e["id"] for e in entries if e["text"] == text)
-    context.response = context.client.post(f"/entries/{entry_id}/delete")
+    context.response = context.client.post(f"/entries/{find_entry_id(context, text)}/delete")
+
+
+@when('el usuario modifica el texto "{text}" por "{new_text}"')
+def step_update_text(context, text, new_text):
+    entry_id = find_entry_id(context, text)
+    context.response = context.client.post(f"/entries/{entry_id}/edit", data={"text": new_text})
 
 
 # Igual que el navegador: recargar repite la ultima peticion que produjo la pagina actual.

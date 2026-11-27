@@ -14,6 +14,12 @@ class Sistema:
     def list_entries(self) -> list[Entry]:
         return self._entries.list_all()
 
+    def update_entry(self, entry_id: int, text: str) -> Entry:
+        entry = self._entries.update(entry_id, text)
+        if entry is None:
+            raise EntryNotFound(entry_id)
+        return entry
+
     def delete_entry(self, entry_id: int) -> None:
         if not self._entries.delete(entry_id):
             raise EntryNotFound(entry_id)

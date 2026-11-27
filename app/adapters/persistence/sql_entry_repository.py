@@ -28,6 +28,16 @@ class SqlAlchemyEntryRepository(EntryRepository):
             models = db.query(EntryModel).order_by(EntryModel.id).all()
             return [_to_entry(m) for m in models]
 
+    def update(self, entry_id: int, text: str) -> Entry | None:
+        with self._session_factory() as db:
+            model = db.get(EntryModel, entry_id)
+            if model is None:
+                return None
+            model.text = text
+            db.commit()
+            db.refresh(model)
+            return _to_entry(model)
+
     def delete(self, entry_id: int) -> bool:
         with self._session_factory() as db:
             model = db.get(EntryModel, entry_id)

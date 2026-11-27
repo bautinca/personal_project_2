@@ -97,5 +97,61 @@ def test_create_from_form_redirects_to_index(client):
     assert [e["text"] for e in client.get("/entries").json()] == ["desde el formulario"]
 
 
+def test_update_entry(client):
+    entry_id = create_entry(client, "original")
+
+    r = client.put(f"/entries/{entry_id}", json={"text": "modificado"})
+
+    assert r.status_code == 200
+    assert r.json() == {"id": entry_id, "text": "modificado"}
+    assert client.get("/entries").json() == [{"id": entry_id, "text": "modificado"}]
+
+
+def test_update_missing_entry_returns_404(client):
+    r = client.put("/entries/999", json={"text": "nada"})
+
+    assert r.status_code == 404
+    assert r.json() == {"detail": "Entrada no encontrada"}
+    assert client.get("/entries").json() == []
+
+
+def test_update_without_text_returns_422_and_keeps_entry(client):
+    entry_id = create_entry(client, "original")
+
+    r = client.put(f"/entries/{entry_id}", json={})
+
+    assert r.status_code == 422
+    assert client.get("/entries").json() == [{"id": entry_id, "text": "original"}]
+
+
+def test_update_from_form_redirects_to_index(client):
+    entry_id = create_entry(client, "original")
+
+    r = client.post(f"/entries/{entry_id}/edit", data={"text": "desde la pagina"}, follow_redirects=False)
+
+    assert r.status_code == 303
+    assert r.headers["location"] == "/"
+    assert client.get("/entries").json() == [{"id": entry_id, "text": "desde la pagina"}]
+
+
+def test_update_missing_entry_from_form_keeps_other_entries(client):
+    entry_id = create_entry(client, "se queda")
+
+    r = client.post("/entries/999/edit", data={"text": "nada"})
+
+    assert r.status_code == 200
+    assert client.get("/entries").json() == [{"id": entry_id, "text": "se queda"}]
+
+
+def test_index_page_shows_edit_form(client):
+    entry_id = create_entry(client, "editable")
+
+    r = client.get("/")
+
+    assert f'action="/entries/{entry_id}/edit"' in r.text
+    assert 'value="editable"' in r.text
+    assert "modificar" in r.text
+
+
 def test_version_file_has_a_valid_format():
     assert re.fullmatch(r"\d+\.\d+\.\d+", read_version())

@@ -18,5 +18,11 @@ class InMemoryEntryRepository(EntryRepository):
     def list_all(self) -> list[Entry]:
         return list(self._entries.values())
 
+    def update(self, entry_id: int, text: str) -> Entry | None:
+        if entry_id not in self._entries:
+            return None
+        self._entries[entry_id] = Entry(id=entry_id, text=text)
+        return self._entries[entry_id]
+
     def delete(self, entry_id: int) -> bool:
         return self._entries.pop(entry_id, None) is not None
