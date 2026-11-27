@@ -60,9 +60,14 @@ En cada push y pull request a `main`, el workflow `.github/workflows/ci.yml` cor
 
 Cada tag nuevo despliega su commit en Render (con la base de datos en Supabase), siempre que antes pasen el linter y los tests. Ver `.github/workflows/deploy.yml`.
 
+La version de la app se define a mano en el archivo `VERSION` y el tag tiene que ser identico (sin `v`); si no coinciden, no se despliega.
+
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+echo "1.0.2" > VERSION
+git commit -am "Version 1.0.2"
+git push
+git tag 1.0.2
+git push origin 1.0.2
 ```
 
 ### Configuracion inicial (una sola vez)

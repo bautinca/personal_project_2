@@ -1,3 +1,8 @@
+import re
+
+from app.version import read_version
+
+
 def test_health(client):
     r = client.get("/health")
     assert r.status_code == 200
@@ -7,7 +12,7 @@ def test_health(client):
 def test_version(client):
     r = client.get("/version")
     assert r.status_code == 200
-    assert r.json() == {"version": "10.3"}
+    assert r.json() == {"version": read_version()}
 
 
 def test_create_and_list_entry(client):
@@ -90,3 +95,7 @@ def test_create_from_form_redirects_to_index(client):
     assert r.status_code == 303
     assert r.headers["location"] == "/"
     assert [e["text"] for e in client.get("/entries").json()] == ["desde el formulario"]
+
+
+def test_version_file_has_a_valid_format():
+    assert re.fullmatch(r"\d+\.\d+\.\d+", read_version())

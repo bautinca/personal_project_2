@@ -14,8 +14,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # El tag tiene que coincidir con la version escrita en el archivo VERSION, que es la que muestra la app.
+  version:
+    name: Verificar version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v7
+
+      - name: Comparar el tag con el archivo VERSION
+        run: |
+          version=$(tr -d '[:space:]' < VERSION)
+          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+            echo "::error::El tag $GITHUB_REF_NAME no coincide con el archivo VERSION ($version)."
+            exit 1
+          fi
+
   # No se despliega nada que no pase el linter y los tests.
   ci:
+    needs: version
     uses: ./.github/workflows/ci.yml
 
   deploy:

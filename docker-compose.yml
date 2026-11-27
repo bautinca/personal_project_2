@@ -37,7 +37,6 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+psycopg2://app:app@db:5432/appdb
-      APP_VERSION: "10.3"
     depends_on:
       db:
         condition: service_healthy

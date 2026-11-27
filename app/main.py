@@ -1,5 +1,4 @@
 # Controlador HTTP: traduce peticiones HTTP a llamadas a Sistema y sus resultados a respuestas HTTP.
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
@@ -10,9 +9,9 @@ from .bootstrap import get_sistema, init_infrastructure
 from .hexagon.errors import EntryNotFound
 from .hexagon.sistema import Sistema
 from .schemas import EntryCreate, EntryRead
+from .version import read_version
 
-# Version de la aplicacion obtenida de la variable de entorno APP_VERSION, si no está definida, usamos "10.3" como valor por defecto.
-APP_VERSION = os.getenv("APP_VERSION", "10.3")
+APP_VERSION = read_version()
 
 # Configuración de Jinja2 para renderizar plantillas HTML desde el directorio "app/templates".
 templates = Jinja2Templates(directory="app/templates")

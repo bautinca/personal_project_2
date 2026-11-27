@@ -1,7 +1,6 @@
 import os
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg2://app:app@localhost:5433/appdb_test")
-os.environ.setdefault("APP_VERSION", "10.3")
 
 from fastapi.testclient import TestClient
 

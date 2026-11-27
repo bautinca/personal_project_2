@@ -1,5 +1,7 @@
 from behave import given, then, when
 
+from app.version import read_version
+
 
 @given("la aplicacion esta disponible")
 def step_app_available(context):
@@ -60,6 +62,6 @@ def step_status(context, status):
     assert context.response.json()["status"] == status
 
 
-@then('la version es "{version}"')
-def step_version_value(context, version):
-    assert context.response.json()["version"] == version
+@then("la version es la definida en el archivo VERSION")
+def step_version_value(context):
+    assert context.response.json()["version"] == read_version()

@@ -45,7 +45,7 @@ Except for `tests/unit/test_sistema.py`, tests need a real PostgreSQL; there is 
 
 ## Deployment
 
-Pushing any tag runs `.github/workflows/deploy.yml`: it reuses `ci.yml` (`workflow_call`), then triggers a Render deploy hook for the tagged commit and polls the Render API until it is live or fails. Production is the Docker service in `render.yaml` (auto-deploy off) with PostgreSQL on Supabase (session pooler, `DATABASE_URL` set only in Render). The container listens on `$PORT`, default 8000. Setup steps are in the README.
+Pushing any tag runs `.github/workflows/deploy.yml`: it fails unless the tag equals the contents of `VERSION`, then reuses `ci.yml` (`workflow_call`), then triggers a Render deploy hook for the tagged commit and polls the Render API until it is live or fails. Production is the Docker service in `render.yaml` (auto-deploy off) with PostgreSQL on Supabase (session pooler, `DATABASE_URL` set only in Render). The container listens on `$PORT`, default 8000. Setup steps are in the README.
 
 ## Architecture
 
@@ -64,4 +64,4 @@ Tests: `tests/unit/test_sistema.py` exercises the core with the in-memory adapte
 - There are no migrations. The schema comes from `init_db()` (`create_all`, run in the app lifespan through `bootstrap.init_infrastructure()`), which does not alter existing tables; a model change needs the table or the `db_data` volume recreated.
 - The tests use `TestClient` without a context manager, so the lifespan does not run; the test setup creates the tables itself.
 - The templates directory is a relative path (`app/templates`), so the app and tests must run from the repository root.
-- The version string is repeated in `docker-compose.yml` (`APP_VERSION`), the default in `app/main.py`, `tests/conftest.py`, `environment.py`, and the assertions in `test_api.py` and `text_entry.feature`. Change them together.
+- The version is set by hand in the root `VERSION` file (`X.Y.Z`), read once at startup through `app/version.py`. There is no `APP_VERSION` variable, and tests compare against the file.

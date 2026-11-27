@@ -37,4 +37,4 @@ Feature: Persistir texto ingresado por el usuario
   Scenario: Version endpoint
     Given la aplicacion esta disponible
     When consulto el endpoint de version
-    Then la version es "10.3"
+    Then la version es la definida en el archivo VERSION
