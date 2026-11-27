@@ -45,7 +45,7 @@ Except for `tests/unit/test_sistema.py`, tests need a real PostgreSQL; there is 
 
 ## Deployment
 
-Pushing any tag runs `.github/workflows/deploy.yml`: it fails unless the tag equals the contents of `VERSION`, then reuses `ci.yml` (`workflow_call`), then triggers a Render deploy hook for the tagged commit and polls the Render API until it is live or fails. Production is the Docker service in `render.yaml` (auto-deploy off) with PostgreSQL on Supabase (session pooler, `DATABASE_URL` set only in Render). The container listens on `$PORT`, default 8000. Setup steps are in the README.
+Pushing any tag runs `.github/workflows/deploy.yml`: it fails unless the tag equals the contents of `VERSION`, then reuses `ci.yml` (`workflow_call`), then triggers a Render deploy hook for the tagged commit and polls the Render API until it is live or fails. A final `smoke` job runs `./smoke.sh <url> [version]` against `PRODUCTION_URL` (set in the workflow); the script sends read-only requests and requires `/version` to equal `VERSION` and `/health`, `/entries` and `/` to respond. Production is the Docker service in `render.yaml` (auto-deploy off) with PostgreSQL on Supabase (session pooler, `DATABASE_URL` set only in Render). The container listens on `$PORT`, default 8000. Setup steps are in the README.
 
 ## Architecture
 

@@ -70,6 +70,12 @@ git tag 1.0.2
 git push origin 1.0.2
 ```
 
+Despues del deploy corre un **smoke test** contra produccion: verifica que `/version` coincida con el archivo `VERSION` y que `/health`, `/entries` (acceso a la base) y `/` respondan. Solo lee datos. La logica esta en `smoke.sh` y la URL de produccion en `PRODUCTION_URL` dentro del workflow. Tambien se puede correr a mano (requiere `curl` y `jq`):
+
+```bash
+./smoke.sh https://personal-project-2-1kzb.onrender.com
+```
+
 ### Configuracion inicial (una sola vez)
 
 1. **Supabase:** crear un proyecto. En *Connect*, copiar la cadena de **Session pooler** (puerto 5432), reemplazar la contrasena (codificando caracteres especiales) y agregar `?sslmode=require` al final.

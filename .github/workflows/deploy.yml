@@ -85,3 +85,18 @@ jobs:
             esac
             sleep 15
           done
+
+  # Comprueba desde afuera que produccion este respondiendo con la version recien desplegada (ver smoke.sh).
+  smoke:
+    name: Smoke test en produccion
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PRODUCTION_URL: https://personal-project-2-1kzb.onrender.com
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v7
+
+      - name: Ejecutar el smoke test
+        run: ./smoke.sh "$PRODUCTION_URL"
