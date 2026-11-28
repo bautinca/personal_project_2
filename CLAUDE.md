@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-"Text Entries": a small FastAPI + PostgreSQL app, run with Docker Compose, that stores user-submitted text and lists it. The README, code comments, UI strings and Gherkin scenarios are in Spanish.
+"Text Entries": a small FastAPI + PostgreSQL app, run with Docker Compose, that stores user-submitted text, lists it and translates it to English through the MyMemory API. The README, code comments, UI strings and Gherkin scenarios are in Spanish.
 
 ## Commands
 
@@ -41,7 +41,7 @@ docker compose exec -e DATABASE_URL=$TEST_DB app behave -n "Health endpoint"   #
 
 From the host (with dependencies installed and `db_test` running via `docker compose up -d db_test`), plain `pytest` and `behave` default to `localhost:5433/appdb_test`, provided `DATABASE_URL` is not set in the shell.
 
-Except for `tests/unit/test_sistema.py`, tests need a real PostgreSQL; there is no SQLite fallback.
+Except for `tests/unit/test_sistema.py` and `tests/unit/test_my_memory_translator.py`, tests need a real PostgreSQL; there is no SQLite fallback.
 
 ## Deployment
 
@@ -51,12 +51,13 @@ Pushing any tag runs `.github/workflows/deploy.yml`: it fails unless the tag equ
 
 Hexagonal (ports and adapters):
 
-- `app/hexagon/` is the business core: the `Entry` object, domain errors, the outbound port `EntryRepository` (`ports.py`) and the `Sistema` facade, the only entry point into the core. It must not import FastAPI, SQLAlchemy, Pydantic or anything from `app/adapters`.
+- `app/hexagon/` is the business core: the `Entry` object, domain errors, the outbound ports `EntryRepository` and `Translator` (`ports.py`) and the `Sistema` facade, the only entry point into the core. It must not import FastAPI, SQLAlchemy, Pydantic or anything from `app/adapters`.
 - `app/adapters/persistence/` implements the port: `SqlAlchemyEntryRepository` (maps the ORM `EntryModel` to the domain `Entry`) and `InMemoryEntryRepository`.
+- `app/adapters/translation/` implements `Translator`: `MyMemoryTranslator` (external API, no key, 500 bytes per query, may report errors inside an HTTP 200 body) and `FakeTranslator`. Tests must never call the real API: the `client` fixture and behave's `environment.py` override `get_sistema` with the fake.
 - `app/bootstrap.py` is the composition root, the only place that picks which adapter backs each port.
 - `app/main.py` is a pure HTTP controller. Routes get `Sistema` through `Depends(get_sistema)` and translate domain errors into HTTP responses; business logic and database access do not belong there. `app/schemas.py` holds the HTTP DTOs.
 
-Two interfaces go through the same facade: HTML forms (`GET`/`POST /` rendering `app/templates/index.html`, plus `POST /entries/{id}/edit` and `POST /entries/{id}/delete`; all form POSTs answer with a 303 redirect to `/`, so reloading never resubmits) and a JSON API (`GET`/`POST /entries`, `PUT`/`DELETE /entries/{id}`). `/health` and `/version` are also there.
+The only user interface is the website: HTML forms (`GET`/`POST /` rendering `app/templates/index.html`, plus `POST /entries/{id}/edit` and `POST /entries/{id}/delete`; those form POSTs answer with a 303 redirect to `/`, so reloading never resubmits; the exception is `POST /entries/{id}/translate`, which renders the page directly because translations are never stored). `/health`, `/version` and the read-only `GET /entries` exist for the smoke test and tests. Do not add JSON API routes unless asked: new features only get the routes the website uses.
 
 Tests: `tests/unit/test_sistema.py` exercises the core with the in-memory adapter and needs no database; `tests/unit/test_api.py`, `tests/integration/` and the behave scenarios use real PostgreSQL. Only tests requesting the `client` or `clean_tables` fixtures touch the database.
 

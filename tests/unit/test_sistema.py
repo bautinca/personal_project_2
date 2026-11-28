@@ -1,13 +1,19 @@
 import pytest
 
 from app.adapters.persistence.in_memory_entry_repository import InMemoryEntryRepository
-from app.hexagon.errors import EntryNotFound
+from app.adapters.translation.fake_translator import FakeTranslator
+from app.hexagon.errors import EntryNotFound, TranslationUnavailable
 from app.hexagon.sistema import Sistema
 
 
 @pytest.fixture
-def sistema():
-    return Sistema(InMemoryEntryRepository())
+def translator():
+    return FakeTranslator()
+
+
+@pytest.fixture
+def sistema(translator):
+    return Sistema(InMemoryEntryRepository(), translator)
 
 
 def test_starts_without_entries(sistema):
@@ -66,3 +72,27 @@ def test_update_missing_entry_raises_and_creates_nothing(sistema):
         sistema.update_entry(999, "nada")
 
     assert sistema.list_entries() == []
+
+
+def test_translate_entry_returns_translation_without_modifying_it(sistema, translator):
+    sistema.add_entry("otro")
+    entry = sistema.add_entry("hola")
+
+    assert sistema.translate_entry(entry.id) == "[en] hola"
+    assert translator.requested == ["hola"]
+    assert sistema.list_entries()[-1] == entry
+
+
+def test_translate_missing_entry_raises_without_calling_translator(sistema, translator):
+    with pytest.raises(EntryNotFound):
+        sistema.translate_entry(999)
+
+    assert translator.requested == []
+
+
+def test_translate_entry_propagates_translator_errors(sistema, translator):
+    entry = sistema.add_entry("hola")
+    translator.error = TranslationUnavailable()
+
+    with pytest.raises(TranslationUnavailable):
+        sistema.translate_entry(entry.id)

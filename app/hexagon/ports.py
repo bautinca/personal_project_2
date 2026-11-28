@@ -10,6 +10,10 @@ class EntryRepository(ABC):
         """Guarda un texto y devuelve la entrada creada, con su id asignado."""
 
     @abstractmethod
+    def get(self, entry_id: int) -> Entry | None:
+        """Devuelve la entrada indicada, o None si no existe."""
+
+    @abstractmethod
     def list_all(self) -> list[Entry]:
         """Devuelve todas las entradas ordenadas por id."""
 
@@ -20,3 +24,14 @@ class EntryRepository(ABC):
     @abstractmethod
     def delete(self, entry_id: int) -> bool:
         """Elimina la entrada indicada. Devuelve False si no existe."""
+
+
+# Puerto de salida: lo que el hexagono necesita para traducir, sin importar que servicio se use.
+class Translator(ABC):
+    @abstractmethod
+    def translate(self, text: str) -> str:
+        """Traduce un texto del español al ingles.
+
+        Lanza TextTooLongToTranslate si el texto supera lo que admite el traductor,
+        y TranslationUnavailable si no se pudo obtener la traduccion.
+        """

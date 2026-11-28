@@ -1,5 +1,6 @@
 from behave import given, then, when
 
+from app.hexagon.errors import TranslationUnavailable
 from app.version import read_version
 
 
@@ -74,3 +75,34 @@ def step_status(context, status):
 @then("la version es la definida en el archivo VERSION")
 def step_version_value(context):
     assert context.response.json()["version"] == read_version()
+
+
+@given("el servicio de traduccion no esta disponible")
+def step_translator_down(context):
+    context.translator.error = TranslationUnavailable()
+
+
+@when('el usuario traduce el texto "{text}"')
+def step_translate_text(context, text):
+    context.response = context.client.post(f"/entries/{find_entry_id(context, text)}/translate")
+
+
+@when("el usuario vuelve a la pagina principal")
+def step_visit_index(context):
+    context.response = context.client.get("/")
+
+
+# El traductor falso antepone "[en] " al texto original.
+@then('se muestra la traduccion de "{text}"')
+def step_translation_shown(context, text):
+    assert f"[en] {text}" in context.response.text
+
+
+@then('no se muestra la traduccion de "{text}"')
+def step_translation_not_shown(context, text):
+    assert f"[en] {text}" not in context.response.text
+
+
+@then('se muestra el aviso "{message}"')
+def step_warning_shown(context, message):
+    assert message in context.response.text

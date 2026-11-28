@@ -24,11 +24,17 @@
             {% for entry in entries %}
             <tr>
                 <td>{{ entry.id }}</td>
-                <td>{{ entry.text }}</td>
+                <td>{{ entry.text }}{% if entry.id == translated_id %}
+                    {% if translation_error %}<p role="alert">{{ translation_error }}</p>
+                    {% else %}<p lang="en"><em>{{ translation }}</em></p>{% endif %}
+                {% endif %}</td>
                 <td>
                     <form method="post" action="/entries/{{ entry.id }}/edit">
                         <input type="text" name="text" value="{{ entry.text }}" aria-label="Nuevo texto" required>
                         <button type="submit">modificar</button>
+                    </form>
+                    <form method="post" action="/entries/{{ entry.id }}/translate">
+                        <button type="submit">traducir</button>
                     </form>
                     <form method="post" action="/entries/{{ entry.id }}/delete">
                         <button type="submit">eliminar</button>

@@ -15,6 +15,9 @@ class InMemoryEntryRepository(EntryRepository):
         self._entries[entry.id] = entry
         return entry
 
+    def get(self, entry_id: int) -> Entry | None:
+        return self._entries.get(entry_id)
+
     def list_all(self) -> list[Entry]:
         return list(self._entries.values())
 

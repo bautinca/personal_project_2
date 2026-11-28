@@ -54,3 +54,14 @@ def test_update_only_changes_selected_entry_and_keeps_order(repository):
 def test_update_missing_entry(repository):
     assert repository.update(999, "nada") is None
     assert repository.list_all() == []
+
+
+def test_get_returns_selected_entry(repository):
+    repository.add("otra")
+    entry = repository.add("buscada")
+
+    assert repository.get(entry.id) == entry
+
+
+def test_get_missing_entry(repository):
+    assert repository.get(999) is None

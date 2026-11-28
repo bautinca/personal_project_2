@@ -23,6 +23,11 @@ class SqlAlchemyEntryRepository(EntryRepository):
             db.refresh(model)
             return _to_entry(model)
 
+    def get(self, entry_id: int) -> Entry | None:
+        with self._session_factory() as db:
+            model = db.get(EntryModel, entry_id)
+            return None if model is None else _to_entry(model)
+
     def list_all(self) -> list[Entry]:
         with self._session_factory() as db:
             models = db.query(EntryModel).order_by(EntryModel.id).all()

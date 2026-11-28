@@ -10,6 +10,14 @@ docker compose up --build
 
 App disponible en http://localhost:8000
 
+## Traduccion
+
+Cada texto tiene un boton **traducir** que lo traduce del español al ingles con la API de [MyMemory](https://mymemory.translated.net/doc/spec.php).
+
+- La traduccion no se guarda.
+- El texto se envia a un servicio externo: no usar datos sensibles.
+- MyMemory admite hasta 500 bytes por texto y 5000 caracteres por dia sin identificarse.
+
 ## Tests
 
 Unitarios:

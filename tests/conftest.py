@@ -6,6 +6,11 @@ os.environ.setdefault("DATABASE_URL", "postgresql+psycopg2://app:app@localhost:5
 
 from fastapi.testclient import TestClient
 
+from app.adapters.persistence.database import SessionLocal
+from app.adapters.persistence.sql_entry_repository import SqlAlchemyEntryRepository
+from app.adapters.translation.fake_translator import FakeTranslator
+from app.bootstrap import get_sistema
+from app.hexagon.sistema import Sistema
 from app.main import app
 from tests.database import drop_database, reset_database
 
@@ -19,5 +24,13 @@ def clean_tables():
 
 
 @pytest.fixture
-def client(clean_tables):
-    return TestClient(app)
+def translator():
+    return FakeTranslator()
+
+
+# La app usa la base de testing pero un traductor falso: los tests no llaman a MyMemory.
+@pytest.fixture
+def client(clean_tables, translator):
+    app.dependency_overrides[get_sistema] = lambda: Sistema(SqlAlchemyEntryRepository(SessionLocal), translator)
+    yield TestClient(app)
+    app.dependency_overrides.clear()
