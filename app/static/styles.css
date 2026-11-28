@@ -1,0 +1,261 @@
+/* Colores del tema claro. El tema oscuro los redefine mas abajo. */
+:root {
+    color-scheme: light dark;
+    --background: #f5f6fb;
+    --surface: #ffffff;
+    --border: #e2e4ef;
+    --text: #1c1e2e;
+    --muted: #63677d;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-soft: #eef0ff;
+    --on-primary: #ffffff;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #11121a;
+        --surface: #1a1c28;
+        --border: #2d3042;
+        --text: #eceefa;
+        --muted: #a2a6bd;
+        --primary: #818cf8;
+        --primary-hover: #a5b4fc;
+        --primary-soft: #262a4a;
+        --on-primary: #11121a;
+        --danger: #fca5a5;
+        --danger-soft: #3d1d24;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 3rem 1rem 2rem;
+}
+
+h1 {
+    color: var(--primary);
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    color: var(--muted);
+}
+
+h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0 0.75rem;
+    font-size: 1.1rem;
+}
+
+.count {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 999px;
+    padding: 0 0.6rem;
+    font-size: 0.85rem;
+}
+
+input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font: inherit;
+}
+
+.button {
+    display: inline-block;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.button:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.button.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
+}
+
+.button.primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.button.danger {
+    color: var(--danger);
+}
+
+.button.danger:hover {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+}
+
+/* Contorno visible al navegar con teclado. */
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.new-entry {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.entries {
+    display: grid;
+    gap: 0.75rem;
+    list-style: none;
+}
+
+.entry,
+.empty {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.entry {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+.empty {
+    border-style: dashed;
+    color: var(--muted);
+    text-align: center;
+}
+
+.entry-body {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+}
+
+.entry-id {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.entry-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.translation,
+.alert {
+    margin-top: 0.75rem;
+    border-left: 3px solid;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    overflow-wrap: anywhere;
+}
+
+.translation {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+}
+
+.alert {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.tag {
+    margin-right: 0.4rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.edit summary {
+    list-style: none;
+}
+
+.edit summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Al abrirse, el formulario de edicion se ubica debajo de los botones, que no cambian de lugar. */
+.actions {
+    position: relative;
+}
+
+.actions:has(.edit[open]) {
+    padding-bottom: 3.25rem;
+}
+
+.edit[open] summary {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.edit form {
+    display: flex;
+    gap: 0.5rem;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+footer {
+    margin-top: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+@media (max-width: 30rem) {
+    .container {
+        padding-top: 1.5rem;
+    }
+
+    .new-entry {
+        flex-direction: column;
+    }
+}

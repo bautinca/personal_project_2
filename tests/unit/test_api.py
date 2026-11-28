@@ -23,7 +23,7 @@ def test_index_page_shows_entries(client):
     r = client.get("/")
     assert r.status_code == 200
     assert "texto en tabla" in r.text
-    assert "enviar" in r.text
+    assert "Enviar" in r.text
 
 
 # Crea la entrada como lo hace la pagina y devuelve su id.
@@ -73,7 +73,7 @@ def test_index_page_shows_delete_button(client):
 
     r = client.get("/")
     assert f'action="/entries/{entry_id}/delete"' in r.text
-    assert "eliminar" in r.text
+    assert "Eliminar" in r.text
 
 
 def test_create_from_form_redirects_to_index(client):
@@ -119,7 +119,8 @@ def test_index_page_shows_edit_form(client):
 
     assert f'action="/entries/{entry_id}/edit"' in r.text
     assert 'value="editable"' in r.text
-    assert "modificar" in r.text
+    assert "Editar" in r.text
+    assert "Guardar" in r.text
 
 
 TRANSLATION_ERRORS = [
@@ -148,7 +149,7 @@ def test_translate_from_form_shows_errors_and_keeps_entries(client, translator, 
 
     assert r.status_code == status_code
     assert message in r.text
-    assert "<td>hola" in r.text
+    assert '<p class="entry-text">hola</p>' in r.text
 
 
 def test_translate_missing_entry_from_form_redirects_to_index(client):
@@ -164,8 +165,23 @@ def test_index_page_shows_translate_button_without_calling_translator(client, tr
     r = client.get("/")
 
     assert f'action="/entries/{entry_id}/translate"' in r.text
-    assert "traducir" in r.text
+    assert "Traducir" in r.text
     assert translator.requested == []
+
+
+def test_index_page_without_entries_shows_empty_message(client):
+    r = client.get("/")
+
+    assert "Todavía no hay textos guardados" in r.text
+
+
+def test_index_page_links_the_stylesheet(client):
+    href = f"/static/styles.css?v={read_version()}"
+
+    assert f'href="{href}"' in client.get("/").text
+    r = client.get(href)
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("text/css")
 
 
 def test_version_file_has_a_valid_format():

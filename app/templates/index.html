@@ -2,47 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Text Entries</title>
+    <!-- La version en la URL evita que el navegador siga usando estilos viejos tras un deploy. -->
+    <link rel="stylesheet" href="/static/styles.css?v={{ version }}">
 </head>
 <body>
-    <h1>Ingresa un texto</h1>
-    <form method="post" action="/">
-        <input type="text" name="text" required>
-        <button type="submit">enviar</button>
-    </form>
+    <main class="container">
+        <header>
+            <h1>Text Entries</h1>
+            <p class="subtitle">Guardá, editá y traducí tus textos</p>
+        </header>
 
-    <h2>Textos guardados</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Texto</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
+        <form class="new-entry" method="post" action="/">
+            <input type="text" name="text" placeholder="Escribí un texto..." aria-label="Texto" required>
+            <button type="submit" class="button primary">Enviar</button>
+        </form>
+
+        <h2>Textos guardados <span class="count">{{ entries|length }}</span></h2>
+
+        <ul class="entries">
             {% for entry in entries %}
-            <tr>
-                <td>{{ entry.id }}</td>
-                <td>{{ entry.text }}{% if entry.id == translated_id %}
-                    {% if translation_error %}<p role="alert">{{ translation_error }}</p>
-                    {% else %}<p lang="en"><em>{{ translation }}</em></p>{% endif %}
-                {% endif %}</td>
-                <td>
-                    <form method="post" action="/entries/{{ entry.id }}/edit">
-                        <input type="text" name="text" value="{{ entry.text }}" aria-label="Nuevo texto" required>
-                        <button type="submit">modificar</button>
-                    </form>
+            <li class="entry">
+                <div class="entry-body">
+                    <span class="entry-id">#{{ entry.id }}</span>
+                    <p class="entry-text">{{ entry.text }}</p>
+                </div>
+
+                {% if entry.id == translated_id %}
+                    {% if translation_error %}
+                    <p class="alert" role="alert">{{ translation_error }}</p>
+                    {% else %}
+                    <p class="translation" lang="en"><span class="tag">EN</span> <em>{{ translation }}</em></p>
+                    {% endif %}
+                {% endif %}
+
+                <div class="actions">
                     <form method="post" action="/entries/{{ entry.id }}/translate">
-                        <button type="submit">traducir</button>
+                        <button type="submit" class="button">Traducir</button>
                     </form>
+                    <!-- details muestra el formulario de edicion al tocar "Editar", sin JavaScript. -->
+                    <details class="edit">
+                        <summary class="button">Editar</summary>
+                        <form method="post" action="/entries/{{ entry.id }}/edit">
+                            <input type="text" name="text" value="{{ entry.text }}" aria-label="Nuevo texto" required>
+                            <button type="submit" class="button primary">Guardar</button>
+                        </form>
+                    </details>
                     <form method="post" action="/entries/{{ entry.id }}/delete">
-                        <button type="submit">eliminar</button>
+                        <button type="submit" class="button danger">Eliminar</button>
                     </form>
-                </td>
-            </tr>
+                </div>
+            </li>
+            {% else %}
+            <li class="empty">Todavía no hay textos guardados</li>
             {% endfor %}
-        </tbody>
-    </table>
+        </ul>
+
+        <footer>v{{ version }}</footer>
+    </main>
 </body>
 </html>

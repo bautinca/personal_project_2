@@ -62,9 +62,9 @@ def step_text_not_in_page(context, text):
     assert text not in context.response.text
 
 
-@then('el texto "{text}" aparece una sola vez en la tabla')
+@then('el texto "{text}" aparece una sola vez en la lista')
 def step_text_once(context, text):
-    assert context.response.text.count(f"<td>{text}</td>") == 1
+    assert context.response.text.count(f'<p class="entry-text">{text}</p>') == 1
 
 
 @then('el estado es "{status}"')

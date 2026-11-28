@@ -1,6 +1,6 @@
 Feature: Alta, baja y modificacion de textos ingresados por el usuario
 
-  Scenario: El usuario ingresa un texto y aparece en la tabla
+  Scenario: El usuario ingresa un texto y aparece en la lista
     Given la aplicacion esta disponible
     When el usuario envia el texto "Hola behave"
     Then la respuesta es exitosa
@@ -11,7 +11,7 @@ Feature: Alta, baja y modificacion de textos ingresados por el usuario
     When el usuario envia el texto "Una sola vez"
     And el usuario recarga la pagina
     Then la respuesta es exitosa
-    And el texto "Una sola vez" aparece una sola vez en la tabla
+    And el texto "Una sola vez" aparece una sola vez en la lista
 
   Scenario: El usuario elimina un texto y desaparece de la tabla
     Given la aplicacion esta disponible
@@ -34,7 +34,7 @@ Feature: Alta, baja y modificacion de textos ingresados por el usuario
     When el usuario envia el texto "Texto original"
     And el usuario modifica el texto "Texto original" por "Texto corregido"
     Then la respuesta es exitosa
-    And el texto "Texto corregido" aparece una sola vez en la tabla
+    And el texto "Texto corregido" aparece una sola vez en la lista
     And el texto "Texto original" no aparece en la pagina
 
   Scenario: Modificar un texto no afecta a los demas
@@ -43,6 +43,6 @@ Feature: Alta, baja y modificacion de textos ingresados por el usuario
     And el usuario envia el texto "Texto que se queda"
     And el usuario modifica el texto "Texto a cambiar" por "Texto cambiado"
     Then la respuesta es exitosa
-    And el texto "Texto cambiado" aparece una sola vez en la tabla
-    And el texto "Texto que se queda" aparece una sola vez en la tabla
+    And el texto "Texto cambiado" aparece una sola vez en la lista
+    And el texto "Texto que se queda" aparece una sola vez en la lista
     And el texto "Texto a cambiar" no aparece en la pagina

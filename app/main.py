@@ -1,6 +1,7 @@
 # Controlador HTTP: traduce peticiones HTTP a llamadas a Sistema y sus resultados a respuestas HTTP.
 from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .bootstrap import get_sistema
@@ -23,6 +24,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 # Creación de la instancia de FastAPI con título y versión. El esquema de la base lo gestiona Alembic antes de arrancar.
 app = FastAPI(title="Text Entries", version=APP_VERSION)
+# Archivos que usa la pagina, como la hoja de estilos.
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 # Endoint de salud de la aplicación que devuelve un JSON con el estado "ok" simplemente
